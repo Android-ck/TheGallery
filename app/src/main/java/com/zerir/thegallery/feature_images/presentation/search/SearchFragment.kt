@@ -8,14 +8,19 @@ import android.view.inputmethod.EditorInfo
 import androidx.fragment.app.Fragment
 import androidx.navigation.Navigation
 import com.zerir.thegallery.R
-import com.zerir.thegallery.base.network.Resource
 import com.zerir.thegallery.databinding.FragmentSearchBinding
 import com.zerir.thegallery.feature_images.domain.model.Image
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
-import android.app.Activity
-import android.view.inputmethod.InputMethodManager
+import android.content.Context
+import android.net.ConnectivityManager
+import android.view.View.GONE
+import android.view.View.VISIBLE
 import androidx.fragment.app.viewModels
+import com.google.android.material.snackbar.Snackbar
+import com.zerir.thegallery.base.ui.LoadingDialog
+import com.zerir.thegallery.base.ui.KeyboardUtils
+import com.zerir.thegallery.base.ui.Notify
 
 @AndroidEntryPoint
 class SearchFragment : Fragment(), OnImageClickListener {
@@ -25,6 +30,15 @@ class SearchFragment : Fragment(), OnImageClickListener {
 
     @Inject
     lateinit var adapter: ImageAdapter
+
+    @Inject
+    lateinit var loadingDialog: LoadingDialog
+
+    @Inject
+    lateinit var keyboardUtils: KeyboardUtils
+
+    @Inject
+    lateinit var notify: Notify
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -57,25 +71,58 @@ class SearchFragment : Fragment(), OnImageClickListener {
         viewModel.uiState.observe(viewLifecycleOwner) { uiState ->
             uiState?.let {
                 binding.searchEt.setText(uiState.query)
-                when (val resource = uiState.resource) {
-                    is Resource.Success -> {
-                        val images = resource.data?.hits ?: listOf()
-                        adapter.submitList(images)
-                    }
-                    is Resource.Failure -> {
-                        //TODO: handle errors
-                    }
-                    is Resource.Loading -> { }
-                }
+
+                updateImagesList(uiState.images)
+
+                val showLoader = uiState.loading && uiState.images.isNullOrEmpty()
+                showLoader(showLoader)
+
+                handleError(uiState.throwable)
             }
+        }
+
+        viewModel.isConnection.observe(viewLifecycleOwner) { isConnection ->
+            updateConnectionStatus(isConnection)
         }
     }
 
     private fun search() {
-        hideKeyboard()
+        keyboardUtils.hideKeyboard(requireActivity())
         binding.searchEt.clearFocus()
         val query = binding.searchEt.text.toString()
         viewModel.searchImages(query)
+    }
+
+    private fun updateImagesList(images: List<Image>?) {
+        if (images.isNullOrEmpty()) {
+            binding.emptyTv.visibility = VISIBLE
+        } else {
+            binding.emptyTv.visibility = GONE
+        }
+        adapter.submitList(images)
+    }
+
+    private fun updateConnectionStatus(isConnection: Boolean?) {
+        if(isConnection == true) binding.connectionStatus.visibility = GONE
+        else binding.connectionStatus.visibility = VISIBLE
+    }
+
+    private fun showLoader(showLoader: Boolean) {
+        if (showLoader) loadingDialog.show(requireActivity().supportFragmentManager, "search-tag")
+        else if (loadingDialog.isAdded) loadingDialog.dismiss()
+    }
+
+    private fun handleError(throwable: Throwable?) {
+        if (throwable == null) return
+
+        viewModel.clearError()
+
+        val message = getString(R.string.something_went_wrong)
+        notify.showSnackBar(
+            message = message,
+            view = binding.root,
+            time = Snackbar.LENGTH_SHORT,
+        )
     }
 
     override fun onImageClicked(image: Image) {
@@ -86,14 +133,19 @@ class SearchFragment : Fragment(), OnImageClickListener {
             .navigate(action)
     }
 
-    private fun hideKeyboard() {
-        val imm =
-            requireActivity().getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
-        var view = requireActivity().currentFocus
-        if (view == null) {
-            view = View(requireActivity())
-        }
-        imm.hideSoftInputFromWindow(view.windowToken, 0)
+    private fun getConnectivityManager() =
+        requireContext().getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+
+    override fun onResume() {
+        super.onResume()
+        getConnectivityManager()
+            .registerNetworkCallback(viewModel.networkRequest, viewModel.networkCallback)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        getConnectivityManager()
+            .registerNetworkCallback(viewModel.networkRequest, viewModel.networkCallback)
     }
 
     override fun onDestroyView() {

@@ -5,11 +5,11 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.bumptech.glide.Glide
 import com.zerir.thegallery.R
-import com.zerir.thegallery.base.network.Resource
 import com.zerir.thegallery.databinding.FragmentImageDetailsBinding
 import com.zerir.thegallery.feature_images.domain.model.Image
 import dagger.hilt.android.AndroidEntryPoint
@@ -32,18 +32,8 @@ class ImageDetailsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        viewModel.resource.observe(viewLifecycleOwner) { resource ->
-                when (resource) {
-                    is Resource.Success -> {
-                        resource.data?.hits?.let { hits ->
-                            if(hits.isNotEmpty()) updateUi(hits[0])
-                        }
-                    }
-                    is Resource.Failure -> {
-                        //TODO: errors
-                    }
-                    is Resource.Loading -> { }
-                }
+        viewModel.image.observe(viewLifecycleOwner) { image ->
+            image?.let { updateUi(image) }
         }
     }
 
@@ -57,6 +47,8 @@ class ImageDetailsFragment : Fragment() {
 
         Glide.with(requireActivity().applicationContext)
             .load(image.largeImageURL)
+            .placeholder(ActivityCompat.getDrawable(requireActivity(), R.drawable.ic_download_large))
+            .error(ActivityCompat.getDrawable(requireActivity(), R.drawable.ic_download_failed_large))
             .into(binding.imageIv)
     }
 

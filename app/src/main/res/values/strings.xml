@@ -1,8 +1,11 @@
 <resources>
     <string name="app_name">TheGallery</string>
-    <string name="connection_lost">Connection Lost, Please check your connection and try again</string>
+    <string name="connection_lost">Connection Lost</string>
     <string name="search">Search</string>
     <string name="likes">Likes</string>
     <string name="comments">Comments</string>
     <string name="downloads">Downloads</string>
+    <string name="something_went_wrong">Something went wrong, Please try again later</string>
+    <string name="no_images_available">No Images Available</string>
+    <string name="dismiss">Dismiss</string>
 </resources>

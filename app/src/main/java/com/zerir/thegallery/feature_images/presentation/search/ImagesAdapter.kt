@@ -5,7 +5,8 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
+import com.zerir.thegallery.R
+import com.zerir.thegallery.base.ui.loadImage
 import com.zerir.thegallery.databinding.RowImageItemBinding
 import com.zerir.thegallery.feature_images.domain.model.Image
 import javax.inject.Inject
@@ -48,12 +49,11 @@ class ImageAdapter @Inject constructor() : ListAdapter<Image, RecyclerView.ViewH
             binding.nameTv.text = image.user
             binding.tagsIv.text = image.tags
 
-            image.previewURL.isNotBlank().let {
-                Glide.with(binding.root.context.applicationContext)
-                    .load(image.previewURL)
-                    .dontTransform()
-                    .into(binding.thumbnailIv)
-            }
+            binding.thumbnailIv.loadImage(
+                image.previewURL,
+                loading = R.drawable.ic_download,
+                error = R.drawable.ic_download_failed,
+            )
 
             binding.root.setOnClickListener { onImageClickListener?.onImageClicked(image) }
         }

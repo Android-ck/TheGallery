@@ -1,11 +1,9 @@
 package com.zerir.thegallery.feature_images.presentation.details
 
 import androidx.lifecycle.*
-import com.zerir.thegallery.base.network.Resource
-import com.zerir.thegallery.feature_images.data.remote.response.RetrieveResponse
+import com.zerir.thegallery.feature_images.domain.model.Image
 import com.zerir.thegallery.feature_images.domain.use_case.GetImageByIdUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -15,20 +13,16 @@ class ImageDetailsViewModel @Inject constructor(
     state: SavedStateHandle,
 ) : ViewModel() {
 
-    private val _resource = MutableLiveData<Resource<RetrieveResponse>?>()
-    val resource: LiveData<Resource<RetrieveResponse>?> get() = _resource
+    private val _image = MutableLiveData<Image?>()
+    val image: LiveData<Image?> get() = _image
 
     init {
-        val query = state.get<String>("imageQuery") ?: ""
         val id = state.get<String>("imageId") ?: ""
-        getImageById(query = query, id = id)
+        getImageById(id = id)
     }
 
-    private fun getImageById(query: String, id: String) = viewModelScope.launch {
-        val q = query.lowercase().trim()
-        getImageByIdUseCase(query = q, id = id).collect { resource ->
-            _resource.value = resource
-        }
+    private fun getImageById(id: String) = viewModelScope.launch {
+        _image.value = getImageByIdUseCase(id = id)
     }
 
 }

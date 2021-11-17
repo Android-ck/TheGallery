@@ -22,3 +22,7 @@
 
 -Architecture:
     MVVM Clean Architecture using Repository and Use-Cases
+
+-caching
+    Room 
+    SharedPreference
