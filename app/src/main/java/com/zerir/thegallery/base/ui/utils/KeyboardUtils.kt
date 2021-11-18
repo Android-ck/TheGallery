@@ -1,4 +1,4 @@
-package com.zerir.thegallery.base.ui
+package com.zerir.thegallery.base.ui.utils
 
 import android.app.Activity
 import android.view.View

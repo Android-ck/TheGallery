@@ -14,9 +14,10 @@
         <entry key="app/src/main/res/drawable/signal_off.xml" value="0.21574074074074073" />
         <entry key="app/src/main/res/layout/activity_main.xml" value="0.175" />
         <entry key="app/src/main/res/layout/fragment_image_details.xml" value="0.165" />
-        <entry key="app/src/main/res/layout/fragment_search.xml" value="0.375" />
+        <entry key="app/src/main/res/layout/fragment_search.xml" value="0.165" />
         <entry key="app/src/main/res/layout/row_image_item.xml" value="0.165" />
         <entry key="app/src/main/res/layout/view_disconnection.xml" value="0.125" />
+        <entry key="app/src/main/res/layout/view_image_details_dialog.xml" value="0.165" />
         <entry key="app/src/main/res/layout/view_loading.xml" value="0.30564102564102563" />
         <entry key="app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml" value="0.21574074074074073" />
         <entry key="app/src/main/res/mipmap-anydpi-v26/ic_launcher_round.xml" value="0.21574074074074073" />

@@ -1,7 +1,6 @@
 package com.zerir.thegallery.feature_images.data.local.preference
 
 import android.content.Context
-import com.zerir.thegallery.feature_images.Constants
 import com.zerir.thegallery.feature_images.domain.preference.TagPreference
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
@@ -20,9 +19,8 @@ class TagPreferenceImpl @Inject constructor(
         }
     }
 
-    override fun loadLastSearchTag(): String {
-        return sharedPreferences.getString(TAG_KEY,
-            Constants.DEFAULT_QUERY_SEARCH) ?: Constants.DEFAULT_QUERY_SEARCH
+    override fun loadLastSearchTag(): String? {
+        return sharedPreferences.getString(TAG_KEY, null)
     }
 
     companion object {

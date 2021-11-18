@@ -14,25 +14,16 @@ import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 import android.content.Context
 import android.net.ConnectivityManager
-import android.view.View.GONE
-import android.view.View.VISIBLE
 import androidx.fragment.app.viewModels
 import com.google.android.material.snackbar.Snackbar
-import com.zerir.thegallery.base.ui.LoadingDialog
-import com.zerir.thegallery.base.ui.KeyboardUtils
-import com.zerir.thegallery.base.ui.Notify
+import com.zerir.thegallery.base.ui.utils.KeyboardUtils
+import com.zerir.thegallery.base.ui.utils.Notify
 
 @AndroidEntryPoint
-class SearchFragment : Fragment(), OnImageClickListener {
+class SearchFragment : Fragment() {
 
     private lateinit var binding: FragmentSearchBinding
     private val viewModel by viewModels<SearchViewModel>()
-
-    @Inject
-    lateinit var adapter: ImageAdapter
-
-    @Inject
-    lateinit var loadingDialog: LoadingDialog
 
     @Inject
     lateinit var keyboardUtils: KeyboardUtils
@@ -47,19 +38,13 @@ class SearchFragment : Fragment(), OnImageClickListener {
     ): View {
         binding = FragmentSearchBinding.inflate(inflater, container, false)
 
-        adapter.registerListener(this)
-        binding.imagesRv.setHasFixedSize(true)
-        binding.imagesRv.adapter = adapter
+        binding.lifecycleOwner = viewLifecycleOwner
 
         binding.searchEt.setOnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_SEARCH) {
-                search()
+                viewModel.searchImages()
                 true
             } else false
-        }
-
-        binding.searchIb.setOnClickListener {
-            search()
         }
 
         return binding.root
@@ -68,69 +53,82 @@ class SearchFragment : Fragment(), OnImageClickListener {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        binding.viewModel = viewModel
+
         viewModel.uiState.observe(viewLifecycleOwner) { uiState ->
             uiState?.let {
-                binding.searchEt.setText(uiState.query)
+                onSearch(uiState.isSearching)
 
-                updateImagesList(uiState.images)
-
-                val showLoader = uiState.loading && uiState.images.isNullOrEmpty()
+                val showLoader = uiState.loading
                 showLoader(showLoader)
 
                 handleError(uiState.throwable)
+
+                viewModel.clearUiState()
             }
         }
 
-        viewModel.isConnection.observe(viewLifecycleOwner) { isConnection ->
-            updateConnectionStatus(isConnection)
+        viewModel.onImageClicked.observe(viewLifecycleOwner) { image ->
+            image?.let {
+                moveToDetailsDialog(image)
+
+                viewModel.clearImageClicked()
+            }
         }
     }
 
-    private fun search() {
-        keyboardUtils.hideKeyboard(requireActivity())
-        binding.searchEt.clearFocus()
-        val query = binding.searchEt.text.toString()
-        viewModel.searchImages(query)
-    }
-
-    private fun updateImagesList(images: List<Image>?) {
-        if (images.isNullOrEmpty()) {
-            binding.emptyTv.visibility = VISIBLE
-        } else {
-            binding.emptyTv.visibility = GONE
+    private fun onSearch(isSearching: Boolean?) {
+        if(isSearching == true) {
+            keyboardUtils.hideKeyboard(requireActivity())
+            binding.searchEt.clearFocus()
         }
-        adapter.submitList(images)
-    }
-
-    private fun updateConnectionStatus(isConnection: Boolean?) {
-        if(isConnection == true) binding.connectionStatus.visibility = GONE
-        else binding.connectionStatus.visibility = VISIBLE
     }
 
     private fun showLoader(showLoader: Boolean) {
-        if (showLoader) loadingDialog.show(requireActivity().supportFragmentManager, "search-tag")
-        else if (loadingDialog.isAdded) loadingDialog.dismiss()
+        val navigator = Navigation.findNavController(requireActivity(), R.id.fragmentContainerView)
+        if (showLoader) {
+            val action = SearchFragmentDirections.actionSearchFragmentToLoadingDialog()
+            navigator.navigate(action)
+        }
+        else {
+            val currentDestination = navigator.currentDestination?.id
+            if(currentDestination == R.id.loadingDialog) {
+                navigator.popBackStack()
+            }
+        }
     }
 
     private fun handleError(throwable: Throwable?) {
         if (throwable == null) return
-
-        viewModel.clearError()
-
-        val message = getString(R.string.something_went_wrong)
+        val cause = if(throwable.message.isNullOrBlank()) "" else "\n-> ${throwable.message}"
+        val message = "${getString(R.string.something_went_wrong)}$cause"
         notify.showSnackBar(
             message = message,
             view = binding.root,
-            time = Snackbar.LENGTH_SHORT,
-        )
+            time = Snackbar.LENGTH_INDEFINITE,
+            actionName = getString(R.string.dismiss),
+        ) {}
     }
 
-    override fun onImageClicked(image: Image) {
-        val query = binding.searchEt.text.toString()
-        val action =
-            SearchFragmentDirections.actionSearchFragmentToImageDetailsFragment(query, image.id)
+    private fun moveToDetailsDialog(image: Image) {
+        val action = SearchFragmentDirections.actionSearchFragmentToDetailsDialog(
+            image.largeImageURL, object: OnDetailsClicked {
+                override fun onDetails() {
+                    moveToImageDetails(image)
+                }
+            }
+        )
         Navigation.findNavController(requireActivity(), R.id.fragmentContainerView)
             .navigate(action)
+    }
+
+    private fun moveToImageDetails(image: Image) {
+        if(isAdded) {
+            val action =
+                SearchFragmentDirections.actionSearchFragmentToImageDetailsFragment(image.id)
+            Navigation.findNavController(requireActivity(), R.id.fragmentContainerView)
+                .navigate(action)
+        }
     }
 
     private fun getConnectivityManager() =
@@ -146,10 +144,5 @@ class SearchFragment : Fragment(), OnImageClickListener {
         super.onPause()
         getConnectivityManager()
             .registerNetworkCallback(viewModel.networkRequest, viewModel.networkCallback)
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        adapter.unRegisterListener()
     }
 }

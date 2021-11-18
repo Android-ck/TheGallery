@@ -14,7 +14,7 @@ interface ImageRepository {
 
     fun saveLastSearchTag(tag: String)
 
-    fun loadLastSearchTag(): String
+    fun loadLastSearchTag(): String?
 
     suspend fun cachingImages(images: List<Image>)
 }

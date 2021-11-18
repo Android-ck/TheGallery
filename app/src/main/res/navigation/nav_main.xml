@@ -17,6 +17,12 @@
             app:exitAnim="@anim/fade_out"
             app:popEnterAnim="@anim/fade_in_back"
             app:popExitAnim="@anim/fade_out_back" />
+        <action
+            android:id="@+id/action_searchFragment_to_loadingDialog"
+            app:destination="@id/loadingDialog" />
+        <action
+            android:id="@+id/action_searchFragment_to_detailsDialog"
+            app:destination="@id/detailsDialog" />
     </fragment>
 
     <fragment
@@ -25,10 +31,24 @@
         android:label="ImageDetailsFragment"
         tools:layout="@layout/fragment_image_details" >
         <argument
-            android:name="imageQuery"
-            app:argType="string" />
-        <argument
             android:name="imageId"
             app:argType="string" />
     </fragment>
+    <dialog
+        android:id="@+id/loadingDialog"
+        android:name="com.zerir.thegallery.base.ui.utils.LoadingDialog"
+        android:label="LoadingDialog"
+        tools:layout="@layout/view_loading"/>
+    <dialog
+        android:id="@+id/detailsDialog"
+        android:name="com.zerir.thegallery.feature_images.presentation.search.DetailsDialog"
+        android:label="DetailsDialog"
+        tools:layout="@layout/view_image_details_dialog">
+        <argument
+            android:name="imageUrl"
+            app:argType="string" />
+        <argument
+            android:name="onAction"
+            app:argType="com.zerir.thegallery.feature_images.presentation.search.OnDetailsClicked" />
+    </dialog>
 </navigation>

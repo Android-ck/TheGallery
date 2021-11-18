@@ -34,7 +34,7 @@ class ImageRepositoryImpl @Inject constructor(
         tagPreference.saveLastSearchTag(tag)
     }
 
-    override fun loadLastSearchTag(): String {
+    override fun loadLastSearchTag(): String? {
         return tagPreference.loadLastSearchTag()
     }
 

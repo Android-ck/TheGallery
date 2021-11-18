@@ -5,8 +5,6 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.zerir.thegallery.R
-import com.zerir.thegallery.base.ui.loadImage
 import com.zerir.thegallery.databinding.RowImageItemBinding
 import com.zerir.thegallery.feature_images.domain.model.Image
 import javax.inject.Inject
@@ -46,16 +44,8 @@ class ImageAdapter @Inject constructor() : ListAdapter<Image, RecyclerView.ViewH
         }
 
         fun bind(image: Image, onImageClickListener: OnImageClickListener?) {
-            binding.nameTv.text = image.user
-            binding.tagsIv.text = image.tags
-
-            binding.thumbnailIv.loadImage(
-                image.previewURL,
-                loading = R.drawable.ic_download,
-                error = R.drawable.ic_download_failed,
-            )
-
-            binding.root.setOnClickListener { onImageClickListener?.onImageClicked(image) }
+            binding.image = image
+            binding.onClick = onImageClickListener
         }
     }
 

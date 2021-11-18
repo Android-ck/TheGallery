@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.zerir.thegallery.base.network.NetworkConnection
 import com.zerir.thegallery.base.network.Resource
+import com.zerir.thegallery.feature_images.domain.model.Image
 import com.zerir.thegallery.feature_images.domain.use_case.*
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
@@ -18,7 +19,8 @@ import javax.inject.Inject
 class SearchViewModel @Inject constructor(
     private val retrieveImagesUseCase: RetrieveImagesUseCase,
     private val getLastSearchTagUseCase: GetLastSearchTagUseCase,
-    private val networkConnection: NetworkConnection
+    private val networkConnection: NetworkConnection,
+    val imageAdapter: ImageAdapter,
 ) : ViewModel() {
 
     private val _uiState = MutableLiveData<UiState?>()
@@ -28,28 +30,53 @@ class SearchViewModel @Inject constructor(
 
     val isConnection: LiveData<Boolean> get() = networkConnection.connected
 
+    private val _isListIsEmpty = MutableLiveData<Boolean?>()
+    val isListIsEmpty: LiveData<Boolean?> get() = _isListIsEmpty
+
     val networkRequest get() = networkConnection.getNetworkRequest()
     val networkCallback get() = networkConnection.getNetworkCallBack()
 
+    lateinit var query: String
+
+    private val _onImageClicked = MutableLiveData<Image?>()
+    val onImageClicked: LiveData<Image?> get() = _onImageClicked
+
     init {
         viewModelScope.launch {
-            val query = getLastSearchTagUseCase()
-            searchImages(query)
+            query = getLastSearchTagUseCase() ?: UiState.DEFAULT_QUERY_SEARCH
+            searchImages()
         }
+
+        imageAdapter.registerListener(object: OnImageClickListener {
+            override fun onImageClicked(image: Image) {
+                _onImageClicked.value = image
+            }
+        })
     }
 
-    fun searchImages(query: String) {
+    fun searchImages() {
+        _uiState.value = UiState(isSearching = true, false, null)
         retrieveImagesJob?.cancel()
         retrieveImagesJob = retrieveImagesUseCase(query).onEach { resource ->
             _uiState.value = UiState(
-                query = query,
-                images = resource.data ?: listOf(),
-                loading = resource is Resource.Loading,
+                isSearching = false,
+                loading = resource is Resource.Loading && resource.data.isNullOrEmpty(),
                 throwable = resource.throwable,
             )
+            //submit list
+            imageAdapter.submitList(resource.data)
+            //update ui with list size
+            _isListIsEmpty.value = resource.data.isNullOrEmpty()
         }.launchIn(viewModelScope)
     }
 
-    fun clearError() { _uiState.value?.throwable = null }
+    fun clearUiState() { _uiState.value = null }
+
+    fun clearImageClicked() { _onImageClicked.value = null }
+
+    override fun onCleared() {
+        super.onCleared()
+        imageAdapter.unRegisterListener()
+    }
 
 }

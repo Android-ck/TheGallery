@@ -4,6 +4,6 @@ interface TagPreference {
 
     fun saveLastSearchTag(tag: String)
 
-    fun loadLastSearchTag(): String
+    fun loadLastSearchTag(): String?
 
 }

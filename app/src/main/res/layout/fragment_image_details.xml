@@ -1,107 +1,127 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".feature_images.presentation.details.ImageDetailsFragment">
+<layout>
 
-    <FrameLayout
+    <data>
+        <import type="com.zerir.thegallery.R"/>
+
+        <variable
+            name="viewModel"
+            type="com.zerir.thegallery.feature_images.presentation.details.ImageDetailsViewModel" />
+    </data>
+
+    <androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="match_parent"
+        android:overScrollMode="never"
+        tools:context=".feature_images.presentation.details.ImageDetailsFragment">
 
-        <androidx.constraintlayout.widget.ConstraintLayout
+        <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="wrap_content">
 
-            <ImageView
-                android:id="@+id/image_iv"
+            <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:contentDescription="@null"
-                android:scaleType="center"
-                app:srcCompat="@drawable/ic_download_failed_large"
-                android:background="@color/teal_700"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                android:layout_height="match_parent">
 
-            <TextView
-                android:id="@+id/name_tv"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:layout_marginTop="16dp"
-                android:maxLines="1"
-                android:textColor="@color/teal_700"
-                android:textSize="18sp"
-                android:textStyle="bold"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/image_iv"
-                tools:text="User-Name" />
+                <ImageView
+                    android:id="@+id/image_iv"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@color/teal_700"
+                    android:contentDescription="@null"
+                    android:scaleType="center"
+                    app:imageUrl="@{viewModel.image.largeImageURL}"
+                    app:placeHolder="@{R.drawable.ic_download_large}"
+                    app:errorHolder="@{R.drawable.ic_download_failed_large}"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:srcCompat="@drawable/ic_download_failed_large" />
 
-            <TextView
-                android:id="@+id/tags_tv"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:layout_marginTop="8dp"
-                android:textColor="@color/teal_700"
-                android:textSize="18sp"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/name_tv"
-                tools:text="tag1, tag2, tag2" />
+                <TextView
+                    android:id="@+id/name_tv"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="16dp"
+                    android:maxLines="1"
+                    android:textColor="@color/teal_700"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:text="@{viewModel.image.user}"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/image_iv"
+                    tools:text="User-Name" />
 
-            <TextView
-                android:id="@+id/likes_tv"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="16dp"
-                android:layout_marginBottom="16dp"
-                android:gravity="center"
-                android:textColor="@color/teal_700"
-                android:textSize="18sp"
-                android:drawablePadding="4dp"
-                app:drawableStartCompat="@drawable/ic_like"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="@+id/comments_tv"
-                tools:text="likes\n1230123" />
+                <TextView
+                    android:id="@+id/tags_tv"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="8dp"
+                    android:textColor="@color/teal_700"
+                    android:textSize="18sp"
+                    android:text="@{viewModel.image.tags}"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/name_tv"
+                    tools:text="tag1, tag2, tag2" />
 
-            <TextView
-                android:id="@+id/comments_tv"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:layout_marginTop="16dp"
-                android:layout_marginBottom="16dp"
-                android:gravity="center"
-                android:textColor="@color/teal_700"
-                android:textSize="18sp"
-                android:drawablePadding="4dp"
-                app:drawableStartCompat="@drawable/ic_comment"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/tags_tv"
-                tools:text="comments\n9090" />
+                <TextView
+                    android:id="@+id/likes_tv"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="16dp"
+                    android:layout_marginBottom="16dp"
+                    android:drawablePadding="4dp"
+                    android:gravity="center"
+                    android:textColor="@color/teal_700"
+                    android:textSize="18sp"
+                    android:text='@{@string/likes + "\n" + viewModel.image.likes}'
+                    app:drawableStartCompat="@drawable/ic_like"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="@+id/comments_tv"
+                    tools:text="likes\n1230123" />
 
-            <TextView
-                android:id="@+id/download_tv"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:layout_marginEnd="8dp"
-                android:layout_marginBottom="16dp"
-                android:gravity="center"
-                android:textColor="@color/teal_700"
-                android:textSize="18sp"
-                android:drawablePadding="4dp"
-                app:drawableStartCompat="@drawable/ic_download"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@+id/likes_tv"
-                app:layout_constraintStart_toEndOf="@+id/comments_tv"
-                app:layout_constraintTop_toTopOf="@+id/comments_tv"
-                tools:text="downloads\n102939" />
-        </androidx.constraintlayout.widget.ConstraintLayout>
-    </FrameLayout>
-</androidx.core.widget.NestedScrollView>
+                <TextView
+                    android:id="@+id/comments_tv"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginBottom="16dp"
+                    android:drawablePadding="4dp"
+                    android:gravity="center"
+                    android:textColor="@color/teal_700"
+                    android:textSize="18sp"
+                    android:text='@{@string/comments + "\n" + viewModel.image.comments}'
+                    app:drawableStartCompat="@drawable/ic_comment"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/tags_tv"
+                    tools:text="comments\n9090" />
+
+                <TextView
+                    android:id="@+id/download_tv"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginEnd="8dp"
+                    android:layout_marginBottom="16dp"
+                    android:drawablePadding="4dp"
+                    android:gravity="center"
+                    android:textColor="@color/teal_700"
+                    android:textSize="18sp"
+                    android:text='@{@string/downloads + "\n" + viewModel.image.downloads}'
+                    app:drawableStartCompat="@drawable/ic_download"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toStartOf="@+id/likes_tv"
+                    app:layout_constraintStart_toEndOf="@+id/comments_tv"
+                    app:layout_constraintTop_toTopOf="@+id/comments_tv"
+                    tools:text="downloads\n102939" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </FrameLayout>
+    </androidx.core.widget.NestedScrollView>
+</layout>

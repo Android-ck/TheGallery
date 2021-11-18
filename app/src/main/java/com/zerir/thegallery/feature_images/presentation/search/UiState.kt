@@ -1,10 +1,13 @@
 package com.zerir.thegallery.feature_images.presentation.search
 
-import com.zerir.thegallery.feature_images.domain.model.Image
-
 data class UiState(
-    val query: String,
-    val images: List<Image>?,
+    val isSearching: Boolean,
     val loading: Boolean,
-    var throwable: Throwable?,
-)
+    val throwable: Throwable?,
+) {
+
+    companion object {
+        const val DEFAULT_QUERY_SEARCH = "fruits"
+    }
+
+}
