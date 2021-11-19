@@ -136,13 +136,13 @@ class SearchFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
-        getConnectivityManager()
-            .registerNetworkCallback(viewModel.networkRequest, viewModel.networkCallback)
+        getConnectivityManager().registerNetworkCallback(viewModel.networkRequest, viewModel.networkCallback)
     }
 
     override fun onPause() {
         super.onPause()
-        getConnectivityManager()
-            .registerNetworkCallback(viewModel.networkRequest, viewModel.networkCallback)
+        try {
+            getConnectivityManager().unregisterNetworkCallback(viewModel.networkCallback)
+        } catch (e: Exception){ }
     }
 }
