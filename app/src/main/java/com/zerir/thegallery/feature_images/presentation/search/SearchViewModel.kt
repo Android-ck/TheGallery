@@ -19,7 +19,7 @@ import javax.inject.Inject
 class SearchViewModel @Inject constructor(
     private val retrieveImagesUseCase: RetrieveImagesUseCase,
     private val getLastSearchTagUseCase: GetLastSearchTagUseCase,
-    private val networkConnection: NetworkConnection,
+    networkConnection: NetworkConnection,
     val imageAdapter: ImageAdapter,
 ) : ViewModel() {
 
@@ -28,13 +28,10 @@ class SearchViewModel @Inject constructor(
 
     private var retrieveImagesJob: Job? = null
 
-    val isConnection: LiveData<Boolean> get() = networkConnection.connected
+    val isConnection: LiveData<Boolean> = networkConnection.connectionState
 
     private val _isListIsEmpty = MutableLiveData<Boolean?>()
     val isListIsEmpty: LiveData<Boolean?> get() = _isListIsEmpty
-
-    val networkRequest get() = networkConnection.getNetworkRequest()
-    val networkCallback get() = networkConnection.getNetworkCallBack()
 
     lateinit var query: String
 

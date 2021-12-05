@@ -12,8 +12,6 @@ import com.zerir.thegallery.databinding.FragmentSearchBinding
 import com.zerir.thegallery.feature_images.domain.model.Image
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
-import android.content.Context
-import android.net.ConnectivityManager
 import androidx.fragment.app.viewModels
 import com.google.android.material.snackbar.Snackbar
 import com.zerir.thegallery.base.ui.utils.KeyboardUtils
@@ -131,20 +129,8 @@ class SearchFragment : Fragment() {
         }
     }
 
-    private fun getConnectivityManager() =
-        requireContext().getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-
-    override fun onResume() {
-        super.onResume()
-        getConnectivityManager().registerNetworkCallback(viewModel.networkRequest, viewModel.networkCallback)
-    }
-
     override fun onPause() {
         super.onPause()
-        try {
-            getConnectivityManager().unregisterNetworkCallback(viewModel.networkCallback)
-        } catch (e: Exception){ }
-
         // close dialog when rotate
         if(Navigation.findNavController(binding.root).currentDestination?.id == R.id.detailsDialog) {
             Navigation.findNavController(binding.root).popBackStack()

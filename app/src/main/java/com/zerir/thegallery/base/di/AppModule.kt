@@ -2,6 +2,7 @@ package com.zerir.thegallery.base.di
 
 import android.app.Application
 import androidx.room.Room
+import com.zerir.thegallery.base.network.NetworkConnection
 import com.zerir.thegallery.base.network.RemoteDataSource
 import com.zerir.thegallery.feature_images.data.local.room.ImageDatabase
 import com.zerir.thegallery.feature_images.data.remote.ImageApi
@@ -30,4 +31,8 @@ object AppModule {
             ImageDatabase.DATABASE_NAME,
         ).build()
     }
+
+    @Provides
+    @Singleton
+    fun provideNetworkConnection(): NetworkConnection = NetworkConnection()
 }

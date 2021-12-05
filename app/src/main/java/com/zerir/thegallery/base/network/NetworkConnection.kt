@@ -11,17 +11,15 @@ import javax.inject.Inject
 class NetworkConnection @Inject constructor() {
 
     private val _connected = MutableLiveData(false)
-    val connected: LiveData<Boolean> get() = _connected
+    val connectionState: LiveData<Boolean> get() = _connected
 
-    fun getNetworkRequest(): NetworkRequest {
-        return NetworkRequest.Builder()
-            .addTransportType(NetworkCapabilities.TRANSPORT_WIFI)
-            .addTransportType(NetworkCapabilities.TRANSPORT_CELLULAR)
-            .build()
-    }
+    val networkRequests: NetworkRequest = NetworkRequest.Builder()
+        .addTransportType(NetworkCapabilities.TRANSPORT_WIFI)
+        .addTransportType(NetworkCapabilities.TRANSPORT_CELLULAR)
+        .build()
 
-    fun getNetworkCallBack(): ConnectivityManager.NetworkCallback {
-        return object : ConnectivityManager.NetworkCallback() {
+    val networkCallbacks: ConnectivityManager.NetworkCallback =
+        object : ConnectivityManager.NetworkCallback() {
             override fun onAvailable(network: Network) {
                 super.onAvailable(network)
                 _connected.postValue(true)
@@ -32,6 +30,28 @@ class NetworkConnection @Inject constructor() {
                 _connected.postValue(false)
             }
         }
+
+    companion object {
+
+        fun registerCallbacks(
+            manager: ConnectivityManager,
+            requests: NetworkRequest,
+            callbacks: ConnectivityManager.NetworkCallback,
+        ) {
+            manager.registerNetworkCallback(requests, callbacks)
+        }
+
+        fun unregisterCallbacks(
+            manager: ConnectivityManager,
+            callbacks: ConnectivityManager.NetworkCallback,
+        ) {
+            try {
+                manager.unregisterNetworkCallback(callbacks)
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+
     }
 
 }
