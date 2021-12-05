@@ -144,5 +144,10 @@ class SearchFragment : Fragment() {
         try {
             getConnectivityManager().unregisterNetworkCallback(viewModel.networkCallback)
         } catch (e: Exception){ }
+
+        // close dialog when rotate
+        if(Navigation.findNavController(binding.root).currentDestination?.id == R.id.detailsDialog) {
+            Navigation.findNavController(binding.root).popBackStack()
+        }
     }
 }
