@@ -5,7 +5,7 @@ import com.zerir.thegallery.feature_images.data.local.room.ImageDatabase
 import com.zerir.thegallery.feature_images.data.remote.ImageApi
 import com.zerir.thegallery.feature_images.data.remote.response.RetrieveResponse
 import com.zerir.thegallery.feature_images.domain.model.Image
-import com.zerir.thegallery.feature_images.domain.preference.TagPreference
+import com.zerir.thegallery.feature_images.data.local.preference.TagPreference
 import com.zerir.thegallery.feature_images.domain.repository.ImageRepository
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject

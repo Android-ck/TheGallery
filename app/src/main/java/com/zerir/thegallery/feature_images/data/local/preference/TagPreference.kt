@@ -1,4 +1,4 @@
-package com.zerir.thegallery.feature_images.domain.preference
+package com.zerir.thegallery.feature_images.data.local.preference
 
 interface TagPreference {
 
